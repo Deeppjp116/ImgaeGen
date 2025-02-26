@@ -29,6 +29,7 @@ model Model {
   ethinicity     EthinicityEnum
   eyeColor       EyeColor
   bald           Boolean
+  UserID         String
   TrainingImages TrainingImages[]
   OutputImages   OutputImages[]
   createdAt      DateTime         @default(now())
@@ -43,13 +44,16 @@ model TrainingImages {
 }
 
 model OutputImages {
-  id        String   @id @default(uuid())
-  imageUrl  String
-  modelId   String
-  userId    String
-  model     Model    @relation(fields: [modelId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String           @id @default(uuid())
+  imageUrl    String 
+  modelId     String
+  userId      String
+  prompt      String
+  status      PromptStatusEnum @default(Pending)
+  model       Model            @relation(fields: [modelId], references: [id])
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  PackPrompts PackPrompts[]
 }
 
 model Packs {
@@ -59,10 +63,18 @@ model Packs {
 }
 
 model PackPrompts {
-  id     String @id @default(uuid())
-  prompt String
-  packId String
-  pack   Packs  @relation(fields: [packId], references: [id])
+  id             String        @id @default(uuid())
+  prompt         String
+  packId         String
+  pack           Packs         @relation(fields: [packId], references: [id])
+  OutputImages   OutputImages? @relation(fields: [outputImagesId], references: [id])
+  outputImagesId String?
+}
+
+enum PromptStatusEnum {
+  Pending
+  Success
+  Failed
 }
 
 enum ModelTypeEnum {
