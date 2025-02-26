@@ -3,7 +3,8 @@ import { TrainModel, GenerateImage, GenerateImageFromPack } from "common/types"
 import { prismaClient } from "db"
 
 
-const User_ID = "1234";
+
+const User_ID = String(Math.random() * 10000);
 const app = express();
 app.use(express.json())
 
@@ -109,21 +110,21 @@ app.get('/pack/bulk', async (req, res) => {
 
 
 app.get('/image/bulk', async (req, res) => {
-    const images = req.query.images as string[];
-    const limit = req.query.limit as string;
-    const offset = req.query.offset as string;
-
+    const ids = req.query.ids as string[];
+    const limit = parseInt(req.query.limit as string) || 10;
+    const offset = parseInt(req.query.offset as string) || 0;
 
 
     const imagesData = await prismaClient.outputImages.findMany({
         where: {
             id: {
-                in: images
+                in: ids
             },
             userId: User_ID
         },
         skip: parseInt(offset),
         take: parseInt(limit)
+
     })
 
     res.json({
